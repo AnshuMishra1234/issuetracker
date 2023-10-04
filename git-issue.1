@@ -1,0 +1,702 @@
+.TH GIT-ISSUE 1 "31 January 2020"
+.\"
+.\" (C) Copyright 2016-2020 Diomidis Spinellis
+.\"
+.\" This file is part of git-issue, the Git-based issue management system.
+.\"
+.\" git-issue is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" git-issue is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with git-issue.  If not, see <http://www.gnu.org/licenses/>.
+.\"
+.SH NAME
+git-issue \- distributed issue management system based on Git
+.SH SYNOPSIS
+\fBgit-issue\fP <command> [<arguments>]
+.SH DESCRIPTION
+\fIGit-issue\fP manages issues, bugs, tickets, feature proposals
+using Git.
+Issues are stored as simple text files, which you can be
+viewed, edited, shared, and backed up with all text-based tools.
+By being based on Git, anyone can add, comment, and
+edit issues without requiring online access to a centralized server.
+The use of Git gives \fIgit issue\fP a robust, efficient, portable,
+and widely available infrastructure.
+It allows the reuse of Git credentials and repositories,
+to support the efficient merging of work, while also providing
+a solid audit trail regarding any changes.
+
+.SH GIT ISSUE COMMANDS
+.\" Auto-generated content from README.md; do not edit this section
+You use \fIgit issue\fP with the following sub-commands.
+
+.RE
+.PP
+\fBgit issue clone\fP
+.RS 4
+Clone the specified remote repository.
+.RE
+.PP
+\fBgit issue init\fP
+.RS 4
+Create a new issues repository in the current directory.
+The \fC-e\fP option uses an existing Git project repository.
+
+.RE
+.PP
+\fBgit issue new\fP
+.RS 4
+Create a new open issue (with optional \fC-s\fP summary and -c "provider user repo" for github/gitlab export).
+.RE
+.PP
+\fBgit issue show\fP
+.RS 4
+Show specified issue (and its comments with \fC-c\fP).
+.RE
+.PP
+\fBgit issue comment\fP
+.RS 4
+Add an issue comment.
+.RE
+.PP
+\fBgit issue edit\fP
+.RS 4
+Edit the specified issue's (or comment's with -c) description
+.RE
+.PP
+\fBgit issue tag\fP
+.RS 4
+Add (or remove with \fC-r\fP) a tag.
+.RE
+.PP
+\fBgit issue milestone\fP
+.RS 4
+Specify (or remove with \fC-r\fP) the issue's milestone.
+.RE
+.PP
+\fBgit issue weight\fP
+.RS 4
+Specify (or remove with \fC-r\fP) the issue's weight.
+The weight is a positive integer that serves as a measure of importance.
+.RE
+.PP
+\fBgit issue duedate\fP
+.RS 4
+Specify (or remove with \fC-r\fP) the issue's due date.
+The command accepts all formats supported by the \fCdate\fP utility.
+.RE
+.PP
+\fBgit issue timeestimate\fP
+.RS 4
+Specify (or remove with \fC-r\fP) a time estimate for this issue.
+Time estimates can be given in a format accepted by \fCdate\fP,
+however bear in mind that it represents a time interval, not a date.
+.RE
+.PP
+\fBgit issue timespent\fP
+.RS 4
+Specify (or remove with \fC-r\fP) the time spent working on an issue so far.
+Follows the same format outlined above.
+If the \fC-a\fP option is given, the time interval will be added together with the existing one.
+.RE
+.PP
+\fBgit issue assign\fP
+.RS 4
+Assign (or remove \fC-r\fP) an issue to a person.
+The person is specified with his/her email address.
+The form \fC@name\fP or \fCname@\fP can be used as a shortcut, provided it
+uniquely identifies an existing assignee or committer.
+Note that if you plan to export the issue to a GitHub/GitLab repository, the assignee may be rejected if
+it doesn't correspond to a valid username, or if you don't have the necessary permissions.
+.RE
+.PP
+\fBgit issue attach\fP
+.RS 4
+Attach (or remove with \fC-r\fP) a file to an issue.
+.RE
+.PP
+\fBgit issue watcher\fP
+.RS 4
+Add (or remove with \fC-r\fP) an issue watcher.
+.RE
+.PP
+\fBgit issue close\fP
+.RS 4
+Remove the \fCopen\fP tag, add the closed tag
+.RE
+.PP
+\fBgit issue list\fP
+.RS 4
+List open issues (or all with \fC-a\fP).
+An optional argument can show issues matching a tag or milestone.
+.RE
+.PP
+\fBgit issue list -l formatstring\fP
+.RS 4
+This will list issues in the specified format, given as an argument to \fC-l\fP.
+The following escape sequences can be used:
+
+.IP "" 8
+\fC%n\fP : newline
+.IP "" 8
+\fC%i\fP : issue ID
+.IP "" 8
+\fC%c\fP : creation date
+.IP "" 8
+\fC%d\fP : due date
+.IP "" 8
+\fC%e\fP : time estimate
+.IP "" 8
+\fC%s\fP : time spent
+.IP "" 8
+\fC%w\fP : weight
+.IP "" 8
+\fC%M\fP : Milestone
+.IP "" 8
+\fC%A\fP : Assignee(s)
+.IP "" 8
+\fC%T\fP : Tags
+.IP "" 8
+\fC%D\fP : Description(first line)
+
+If the format string is one of: (\fConeline\fP, \fCshort\fP or `full`) it will interpreted as the corresponding preset.
+
+Optionally, one of the above given with \fC-o\fP will order based on this field(reverse order with \fC-r\fP).
+
+.RE
+.PP
+\fBgit issue filter-apply command\fP
+.RS 4
+Run \fCcommand\fP in every issue directory. The following environment variables will be set:
+.IP "" 8
+\fCGI_SHA\fP : Sha of the current issue
+.IP "" 8
+\fCGI_IMPORTS\fP : The imports directories for current issue(one on each line)
+.IP "" 8
+\fCGI_AUTHOR\fP : Author of current issue
+.IP "" 8
+\fCGI_DATE\fP : Creation date of current issue
+
+The command can read, add/remove or edit any of the issue's attributes.
+Some potentially useful scripts to be used with this command are in the scripts/ directory.
+Remember to inspect the results (e.g. \fCgi git diff\fP) and commit them with \fCgi git commit -a\fP.
+
+.RE
+.PP
+\fBgit issue push\fP
+.RS 4
+Update remote Git repository with local changes.
+.RE
+.PP
+\fBgit issue pull\fP
+.RS 4
+Update local Git repository with remote changes.
+.RE
+.PP
+\fBgit issue import\fP
+.RS 4
+Import/update GitHub/GitLab issues from the specified project.
+If the import involves more than a dozen of issues or if the repository
+is private, set the environment variable \fCGH_CURL_AUTH\fP (GitHub) or \fCGL_CURL_AUTH\fP (GitLab) to the authentication token.
+For example, run the following command: \fCexport GH_CURL_AUTH="Authorization: token badf00ddead9bfee8f3c19afc3c97c6db55fcfde"\fP
+You can create the authorization token through
+GitHub settings <https://github.com/settings/tokens/new>, with the \fCrepo\fP and \fCdelete_repo\fP(only for running the tests) permissions.
+For GitLab: \fCexport GL_CURL_AUTH="PRIVATE-TOKEN: JvHLsdnDmD7rjUXzT-Ea"\fP. The \fCapi\fP permission is required.
+Use the GitLab settings <https://gitlab.com/profile/personal\fIaccess\fPtokens> to create the token.
+In case the repository is part of a GitLab group, specify repository as groupname/reponame.
+.RE
+.PP
+\fBgit issue create\fP
+.RS 4
+Create the issue in the provided GitHub repository.
+With the \fC-e\fP option any escape sequences for the attributes present in the description, will be replaced as above.
+This can be used to e.g. export an unsupported attribute to GitHub as text.
+.RE
+.PP
+\fBgit issue export\fP
+.RS 4
+Export modified issues for the specified project.
+Only the issues that have been imported and modified (or created by \fCgit issue create\fP) by \fCgit-issue\fP will be exported.
+With the \fC-e\fP option any escape sequences for the attributes present in the description, will be replaced as above.
+This can be used to e.g. export an unsupported attribute to GitHub as text.
+.RE
+.PP
+\fBgit issue exportall\fP
+.RS 4
+Export all open issues in the database (\fC-a\fP to include closed ones) to GitHub/GitLab. Useful for cloning whole repositories.
+
+.RE
+.PP
+\fBgit issue help\fP
+.RS 4
+Display help information about git issue.
+.RE
+.PP
+\fBgit issue log\fP
+.RS 4
+Output a log of changes made
+.RE
+.PP
+\fBgit issue git\fP
+.RS 4
+Run the specified Git command on the issues repository.
+.RE
+.PP
+\fBgit issue dump\fP
+.RS 4
+Dump the whole database in json format to stdout.
+
+Issues and comments are specified through the SHA hash associated with the
+parent of the commit that opened them, which is specifically crafted for
+that element and can be used to derive its date and author.
+
+.SH ENVIRONMENT
+The \fCVISUAL\fP environment variable is used for determining the user's
+editor.
+The \fCPAGER\fP environment variable is used for determining the program
+to use to display long lists of results.
+
+.SH FILES
+.\" Auto-generated content from README.md; do not edit this section
+All data are stored under \fC.issues\fP, which should be placed under \fC.gitignore\fP,
+if it will coexist with another Git-based project.
+The directory contains the following elements.
+.IP "" 4
+A \fC.git\fP directory contains the Git data associated with the issues.
+.IP "" 4
+A \fCconfig\fP file with configuration data.
+.IP "" 4
+An \fCimports\fP directory contains details about imported issues.
+.IP "" 8
+The \fCsha\fP file under \fCimport/<provider>/<user>/<repo>/<number>\fP contains the
+\fIgit-issue\fP SHA corresponding to an imported GitHub \fInumber\fP issue.
+Likewise for GitLab.
+.IP "" 8
+The \fCsha\fP file under \fCimport/<provider>/<user>/<repo>/<number>/comments/<number>\fP
+contains the \fIgit-issue\fP comment SHA corresponding to an imported GitHub/GitLab
+\fInumber\fP comment.
+.IP "" 8
+The file \fCimport/<provider>/<user>/<repo>/checkpoint\fP contains the SHA
+of the last imported or updated issue.  This can be used for merging
+future updates.
+.IP "" 4
+An \fCissues\fP directory contains the individual issues.
+.IP "" 4
+Each issue is stored in a directory named \fCissues/xx/xxxxxxx...\fP,
+where the x's are the SHA of the issue's initial commit.
+.IP "" 4
+Each issue can have the following elements in its directory.
+.IP "" 8
+A \fCdescription\fP file with a one-line summary and a description of the issue.
+.IP "" 8
+A \fCduedate\fP file with the due date stored in ISO-8601 format.
+.IP "" 8
+A \fCweight\fP file with the weight stored as a positive integer.
+.IP "" 8
+A \fCtimespent\fP and \fCtimeestimate\fP file with the time estimate and time spent respectively, stored in seconds.
+.IP "" 8
+A \fCcomments\fP directory where comments are stored, each with the SHA of
+a commit containing the text \fCgi comment mark\fP
+\fIissue SHA\fP.
+.IP "" 8
+An \fCattachments\fP directory where the issue's attachments are stored.
+.IP "" 8
+A \fCtags\fP file containing the issue's tags, one in each line.
+.IP "" 8
+A \fCmilestone\fP file containing the issue's milestone name.
+.IP "" 8
+A \fCwatchers\fP file containing the emails of persons to be notified when the issue changes (one per line).
+.IP "" 8
+An \fCassignee\fP file containing the email for the person assigned to the issue.
+.IP "" 4
+A \fCtemplates\fP directory with message templates.
+
+.SH EXIT STATUS
+The command terminates with a non zero exit code on errors.
+
+.SH EXAMPLES
+.\" Auto-generated content from README.md; do not edit this section
+You can also view a video of the following session on YouTube <https://youtu.be/mLOZGolLmW4>.
+
+.fi
+.ft R
+.PP
+Initialize issue repository
+.ft C
+.nf
+$ git issue init
+Initialized empty Issues repository in /home/dds/src/gi/.issues
+$ git issue new -s 'New issue entered from the command line'
+Added issue e6a95c9
+
+.fi
+.ft R
+.PP
+Create a new issue (opens editor window)
+.ft C
+.nf
+$ git issue new
+Added issue 7dfa5b7
+
+.fi
+.ft R
+.PP
+List open issues
+.ft C
+.nf
+$ git issue list
+7dfa5b7 An issue entered from the editor
+e6a95c9 New issue entered from the command line
+
+.fi
+.ft R
+.PP
+Add an issue comment (opens editor window)
+.ft C
+.nf
+$ git issue comment e6a95c9
+Added comment 8c0d5b3
+
+.fi
+.ft R
+.PP
+Add a due date for the issue
+.ft C
+.nf
+$ git issue duedate "next Tuesday" e6a95c9
+Added duedate 2019-08-13T00:00:00+03:00
+
+.fi
+.ft R
+.PP
+Keep track of time spent on the issue
+.ft C
+.nf
+$ git issue timespent "2hours" e6a95c9
+Added timespent 7200
+
+.fi
+.ft R
+.PP
+Log additional time spent working on it
+.ft C
+.nf
+$ git issue timespent -a "4 hours" e6a95c9
+Added timespent 21600
+
+.fi
+.ft R
+.PP
+Add tag to an issue
+.ft C
+.nf
+$ git issue tag e6a9 urgent
+Added tag urgent
+
+.fi
+.ft R
+.PP
+Add two more tags
+.ft C
+.nf
+$ git issue tag e6a9 gui crash
+Added tag gui
+Added tag crash
+
+.fi
+.ft R
+.PP
+Remove a tag
+.ft C
+.nf
+$ git issue tag -r e6a9 urgent
+Removed tag urgent
+
+.fi
+.ft R
+.PP
+Assign issue
+.ft C
+.nf
+$ git issue assign e6a9 joe@example.com
+Assigned to joe@example.com
+
+.fi
+.ft R
+.PP
+Add issue watcher
+.ft C
+.nf
+$ git issue watcher e6a9 jane@example.com
+Added watcher jane@example.com
+
+.fi
+.ft R
+.PP
+List issues tagged as gui
+.ft C
+.nf
+$ git issue list gui
+e6a95c9 New issue entered from the command line
+
+.fi
+.ft R
+.PP
+Push issues repository to a server
+.ft C
+.nf
+$ git issue git remote add origin git@github.com:dspinellis/gi-example.git
+$ git issue git push -u origin master
+Counting objects: 60, done.
+Compressing objects: 100% (50/50), done.
+Writing objects: 100% (60/60), 5.35 KiB | 0 bytes/s, done.
+Total 60 (delta 8), reused 0 (delta 0)
+To git@github.com:dspinellis/gi-example.git
+ * [new branch]      master -> master
+Branch master set up to track remote branch master from origin.
+
+.fi
+.ft R
+.PP
+Clone issues repository from server
+.ft C
+.nf
+$ git issue clone git@github.com:dspinellis/gi-example.git my-issues
+Cloning into '.issues'...
+remote: Counting objects: 60, done.
+remote: Compressing objects: 100% (42/42), done.
+remote: Total 60 (delta 8), reused 60 (delta 8), pack-reused 0
+Receiving objects: 100% (60/60), 5.35 KiB | 0 bytes/s, done.
+Resolving deltas: 100% (8/8), done.
+Checking connectivity... done.
+Cloned git@github.com:dspinellis/gi-example.git into my-issues
+
+.fi
+.ft R
+.PP
+List open issues
+.ft C
+.nf
+$ git issue list
+7dfa5b7 An issue entered from the editor
+e6a95c9 New issue entered from the command line
+
+.fi
+.ft R
+.PP
+Create new issue
+.ft C
+.nf
+$ git issue new -s 'Issue added on another host'
+Added issue abc9adc
+
+.fi
+.ft R
+.PP
+Push changes to server
+.ft C
+.nf
+$ git issue push
+Counting objects: 7, done.
+Compressing objects: 100% (6/6), done.
+Writing objects: 100% (7/7), 767 bytes | 0 bytes/s, done.
+Total 7 (delta 0), reused 0 (delta 0)
+To git@github.com:dspinellis/gi-example.git
+   d6be890..740f9a0  master -> master
+
+.fi
+.ft R
+.PP
+Show issue added on the other host
+.ft C
+.nf
+$ git issue show 7dfa5b7
+issue 7dfa5b7f4591ecaa8323716f229b84ad40f5275b
+Author: Diomidis Spinellis <dds@aueb.gr>
+Date:   Fri, 29 Jan 2016 01:03:24 +0200
+Tags:   open
+
+    An issue entered from the editor
+
+    Here is a longer description.
+
+.fi
+.ft R
+.PP
+Show issue and comments
+.ft C
+.nf
+$ git issue show -c e6a95c9
+issue e6a95c91b31ded8fc229a41cc4bd7d281ce6e0f1
+Author: Diomidis Spinellis <dds@aueb.gr>
+Date:   Fri, 29 Jan 2016 01:03:20 +0200
+Tags:   open urgent gui crash
+Watchers:       jane@example.com
+Assigned-to: joe@example.com
+
+    New issue entered from the command line
+
+comment 8c0d5b3d77bf93b937cb11038b129f927d49e34a
+Author: Diomidis Spinellis <dds@aueb.gr>
+Date:   Fri, 29 Jan 2016 01:03:57 +0200
+
+    First comment regarding the issue.
+
+.fi
+.ft R
+.PP
+Pull in remote changes (on the original host)
+.ft C
+.nf
+$ git issue pull
+remote: Counting objects: 7, done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 7 (delta 0), reused 7 (delta 0), pack-reused 0
+Unpacking objects: 100% (7/7), done.
+From github.com:dspinellis/gi-example
+   d6be890..740f9a0  master     -> origin/master
+Updating d6be890..740f9a0
+Fast-forward
+ issues/ab/c9adc61025a3cb73b0c67470b65cefc133a8d0/description | 1 +
+ issues/ab/c9adc61025a3cb73b0c67470b65cefc133a8d0/tags        | 1 +
+ 2 files changed, 2 insertions(+)
+ create mode 100644 issues/ab/c9adc61025a3cb73b0c67470b65cefc133a8d0/description
+ create mode 100644 issues/ab/c9adc61025a3cb73b0c67470b65cefc133a8d0/tags
+
+.fi
+.ft R
+.PP
+List open issues
+.ft C
+.nf
+$ git issue list
+7dfa5b7 An issue entered from the editor
+abc9adc Issue added on another host
+e6a95c9 New issue entered from the command line
+
+.fi
+.ft R
+.PP
+Import issues from GitHub
+.ft C
+.nf
+$ git issue import github dspinellis git-issue-test-issues # Import GitHub issues
+Imported/updated issue #3 as 0a27c66
+Imported/updated issue #2 as feb2a2c
+Imported/updated issue #2 comment 416631296 as f7de92c
+Imported/updated issue #2 comment 416631349 as 03acf84
+Imported/updated issue #2 comment 417048301 as 0cd48ed
+Imported/updated issue #2 comment 417049466 as 325a581
+Imported/updated issue #1 as bbe144d
+$ git issue list
+feb2a2c An open issue on GitHub with a description and comments
+0a27c66 An open issue on GitHub with assignees and tags
+$ git issue show 0a27c66
+issue 0a27c6633f492e42bb2a24e6ae458482a4690a55
+Author: dspinellis <dspinellis@users.noreply.github.com>
+Date:   Thu, 30 Aug 2018 20:59:59 +0000
+GitHub issue: #3 at vyrondrosos/git-issue-test-issues
+Tags:   bug
+        duplicate
+        enhancement
+        good first issue
+        open
+Assigned-to:    dspinellis
+        louridas
+
+    An open issue on GitHub with assignees and tags
+
+    Description
+
+Edit History:
+.IP "" 4
+Thu, 30 Aug 2018 20:59:59 +0000 by dspinellis
+.IP "" 4
+<dspinellis@users.noreply.github.com>
+
+.fi
+.ft R
+.PP
+Export all issues to GitHub
+.ft C
+.nf
+$ git issue exportall github dspinellis git-issue-test-issues
+Creating issue 9179d38...
+Couldn't add assignee dspinellis. Skipping...
+Couldn't add assignee louridas. Skipping...
+Creating issue 3651dd3...
+Creating new Milestone ver3...
+Creating comment d72c68d0177b500a91ea37548e6594f84457fd5b...
+Creating comment 6966d4d718c80cf8635e9276d6f391de70c22f93...
+Creating comment 85293a6904d0fbd6238fbb2e1c36fc65af9ffc60...
+Creating comment aea83723c0414ff135afcfb5165d64f8a7ad687c...
+
+.fi
+.ft R
+.PP
+Make changes
+.ft C
+.nf
+$ git issue edit 9179d38
+Opening editor...
+Edited issue 9179d38
+$ git issue edit -c d72c6
+Opening editor...
+Edited comment d72c68d
+
+.fi
+.ft R
+.PP
+Export modified issues back to GitHub
+.ft C
+.nf
+$ git issue export github dspinellis git-issue-test-issues # Needs a token with the relevant permissions
+Issue b83d92872dc16440402516a5f4ce1b8cc6436344 not modified, skipping...
+Comment a93764f32179e93493ceb0a7060efce1e980aff1 not modified, skipping...
+Exporting issue 9179d381135273220301f175c03b101b3e9c703d as #15
+Issue 3651dd38e4e1d9dbce66649710324235c773fe78 not modified, skipping...
+Updating comment d72c68d0177b500a91ea37548e6594f84457fd5b...
+Comment 6966d4d718c80cf8635e9276d6f391de70c22f93 not modified, skipping...
+Comment 85293a6904d0fbd6238fbb2e1c36fc65af9ffc60 not modified, skipping...
+Comment aea83723c0414ff135afcfb5165d64f8a7ad687c not modified, skipping...
+
+.fi
+.ft R
+.PP
+Sub-command auto-completion
+.ft C
+.nf
+$ git issue [Tab]
+assign   clone    comment  git      init     log      pull     show     watcher
+attach   close    edit     help     list     new      push     tag
+
+.fi
+.ft R
+.PP
+Issue SHA auto-completion
+.ft C
+.nf
+$ git issue show [Tab]
+7dfa5b7 - An issue entered from the editor
+e6a95c9 - New issue entered from the command line
+
+.SH SEE ALSO
+.BR git ( 1 ),
+<\fIhttps://github\.com/dspinellis/git\-issue\fR>
+
+.SH AUTHOR
+First version written by Diomidis Spinellis <\fIdds@aueb\.gr\fP>.
+Vuron Drosos <\fIvyrondrosos@gmail.com\fP> implemented the GitHub/GitLab
+export functionality during the Google Summer of Code 2019.
+
+.SH BUGS
+Report bugs through
+<\fIhttps://github\.com/dspinellis/git\-issue/issues\fR>
